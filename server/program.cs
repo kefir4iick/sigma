@@ -8,6 +8,12 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
+builder.Services.AddSingleton<IWeatherService, WeatherService>();
+builder.Services.AddSingleton<IFreespaceService, FreespaceService>();
+builder.Services.AddSingleton<IMemoryinfoService, MemoryinfoService>();
+builder.Services.AddSingleton<IRequestService, RequestService>();
+builder.Services.AddSingleton<IUptimeService, UptimeService>();
+
 var app = builder.Build();
 app.UseCors("AllowAll");
 app.UseMiddleware<LoggingMiddleware>();
