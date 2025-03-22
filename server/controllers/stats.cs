@@ -6,22 +6,37 @@ using System.Diagnostics;
 [Route("[controller]")]
 public class Stats : ControllerBase
 {
-    private static int counter = 0;
-    private static DateTime start_time = DateTime.UtcNow;
+    private readonly IFreespaceService _freespaceService;
+    private readonly IMemoryinfoService _memoryinfoService;
+    private readonly IRequestService _requestService;
+    private readonly IUptimeService _uptimeService;
+    
+    public Stats(IFreespaceService freespaceService,
+        IMemoryinfoService memoryinfoService,
+        IRequestService requestService,
+        IUptimeService uptimeService)
+    {
+        _freespaceService = freespaceService;
+        _memoryinfoService = memoryinfoService;
+        _requestService = requestService;
+        _uptimeService = uptimeService;
+    }
 
     [HttpGet]
     public IActionResult Get()
     {
-        counter = counter + 1;
-        var drive = new DriveInfo(Path.GetPathRoot(Environment.SystemDirectory));
-        var proc = Process.GetCurrentProcess();
-        
+        var free_space = _freespaceService.freespace();
+        var mem = _memoryinfoService.memoryinfo();
+        var request_count = _requestService.count();
+        var uptime = _uptimeService.getuptime();
+    
+
         return Ok(new
         {
-            uptime = DateTime.UtcNow - start_time,
-            request_count = counter,
-            free_space = (drive.AvailableFreeSpace / 1024) / 1024,
-            mem = (proc.WorkingSet64 / 1024) / 1024
+            uptime = uptime,
+            request_count = request_count,
+            free_space = free_space,
+            mem = mem
         });
     }
 }
