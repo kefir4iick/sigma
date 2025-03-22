@@ -1,15 +1,17 @@
+using System.Diagnostics;
+
 public interface IMemoryinfoService
 {
-    long freespace();
+    long memoryinfo();
 }
 
 public class MemoryinfoService : IMemoryinfoService
 {
     private static DateTime start_time = DateTime.UtcNow;
 
-    public long freespace()
+    public long memoryinfo()
     {
-        var drive = new DriveInfo(Path.GetPathRoot(Environment.SystemDirectory));
-        return (drive.AvailableFreeSpace / 1024) / 1024;
+        var proc = Process.GetCurrentProcess();
+        return (proc.WorkingSet64 / 1024) / 1024;
     }
 }
