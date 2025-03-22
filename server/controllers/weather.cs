@@ -1,21 +1,24 @@
+using Microsoft.AspNetCore.Mvc;
 using System;
 
 [ApiController]
 [Route("[controller]")]
 public class Weather : ControllerBase
 {
-    private static readonly string[] List = new[]
+    private readonly IWeatherService _weatherService;
+
+    public Weather(IWeatherService weatherService)
     {
-        "rain", "cold", "sunny"
-    };
+        _weatherService = weatherService;
+    }
 
     [HttpGet]
     public IActionResult Get()
     {
-        var random_value = new Random();
+        var weather = _weatherService.weather();
         return Ok(new
         {
-            weather = List[random_value.Next(List.Length)]
+            weather
         });
     }
 }
