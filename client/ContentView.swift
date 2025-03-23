@@ -42,10 +42,10 @@ struct ContentView: View {
             .padding()
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        .onAppear {
+        /*.onAppear {
             fetchStats()
             fetchWeather()
-        }
+        }*/
     }
     
     func fetchStats() {
