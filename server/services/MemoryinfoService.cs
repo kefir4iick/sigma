@@ -7,8 +7,6 @@ public interface IMemoryinfoService
 
 public class MemoryinfoService : IMemoryinfoService
 {
-    private static DateTime start_time = DateTime.UtcNow;
-
     public long memoryinfo()
     {
         var proc = Process.GetCurrentProcess();
