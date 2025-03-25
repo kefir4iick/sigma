@@ -5,8 +5,6 @@ public interface IFreespaceService
 
 public class FreespaceService : IFreespaceService
 {
-    private static DateTime start_time = DateTime.UtcNow;
-
     public long freespace()
     {
         var drive = new DriveInfo(Path.GetPathRoot(Environment.SystemDirectory));
