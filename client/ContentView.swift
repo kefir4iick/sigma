@@ -4,14 +4,15 @@ struct ContentView: View {
     @State private var statsinfo: String = "..."
     @State private var weatherinfo: String = "..."
     @State private var update: Bool = false
+    @State private var loadstats: Bool = false
+    @State private var loadweather: Bool = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                CardView(title: "stats", content: statsinfo)
-                    .foregroundColor(.white)
+                CardView(title: "stats", content: statsinfo, load: loadstats)
                 
-                CardView(title: "weather", content: weatherinfo)
+                CardView(title: "weather", content: weatherinfo, load: loadweather)
                 
                 Button(action: {
                     update = true
@@ -37,18 +38,15 @@ struct ContentView: View {
                     .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 5)
                 }
                 .padding(.horizontal)
-                .disabled(update)
+                .disabled(loadstats || loadweather)
             }
             .padding()
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        /*.onAppear {
-            fetchStats()
-            fetchWeather()
-        }*/
     }
     
     func fetchStats() {
+        loadstats = true
         guard let url = URL(string: "http://localhost:5230/stats") else { return }
         let session = URLSession(configuration: .ephemeral)
         session.dataTask(with: url) { data, response, error in
@@ -56,6 +54,7 @@ struct ContentView: View {
                 do{
                     let decoded_data = try JSONDecoder().decode(Response1.self, from: data)
                     DispatchQueue.main.async {
+                        loadstats = false
                         self.statsinfo = """
                     Time: \(decoded_data.uptime)
                     Requests: \(decoded_data.request_count)
@@ -72,6 +71,7 @@ struct ContentView: View {
     }
     
     func fetchWeather() {
+        loadweather = true
         guard let url = URL(string: "http://localhost:5230/weather") else { return }
         
         let session = URLSession(configuration: .ephemeral)
@@ -80,6 +80,7 @@ struct ContentView: View {
                 do{
                     let decoded_data = try JSONDecoder().decode(Response2.self, from: data)
                     DispatchQueue.main.async {
+                        loadweather = false
                         self.weatherinfo = "\(decoded_data.weather)"
                     }
                 }
@@ -94,6 +95,7 @@ struct ContentView: View {
 struct CardView: View {
     var title: String
     var content: String
+    var load: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -102,11 +104,16 @@ struct CardView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.red)
             
-            Text(content)
-                .font(.body)
-                .foregroundColor(.white)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
+            if load{
+                ProgressView()
+            }
+            else{
+                Text(content)
+                    .font(.body)
+                    .foregroundColor(.white)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
