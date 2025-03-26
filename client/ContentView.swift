@@ -3,7 +3,6 @@ import SwiftUI
 struct ContentView: View {
     @State private var statsinfo: String = "..."
     @State private var weatherinfo: String = "..."
-    @State private var update: Bool = false
     @State private var loadstats: Bool = false
     @State private var loadweather: Bool = false
 
@@ -15,19 +14,16 @@ struct ContentView: View {
                 CardView(title: "weather", content: weatherinfo, load: loadweather)
                 
                 Button(action: {
-                    update = true
                     fetchStats()
                     fetchWeather()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        update = false
-                    }
+                    
                 }) {
                     HStack {
-                        if update {
+                        if (loadstats || loadweather) {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         }
-                        Text(update ? "" : "Update")
+                        Text((loadstats || loadweather) ? "" : "Update")
                             .font(.headline)
                     }
                     .padding()
@@ -105,7 +101,10 @@ struct CardView: View {
                 .foregroundColor(.red)
             
             if load{
-                ProgressView()
+                HStack{
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                }
             }
             else{
                 Text(content)
